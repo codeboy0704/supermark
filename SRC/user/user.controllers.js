@@ -1,26 +1,12 @@
-import User from "./user";
-import bcrypt from "bcrypt";
+import User from "./usermodel";
 
 export const getUser = async (req, res) => {
   try {
-    const user = await User.find({}).exec();
+    const user = await User.findById(req.body._id).exec();
     res.status(200).json({ data: user });
   } catch (e) {
     console.error(e);
     res.status(400).send();
-  }
-};
-
-export const saveUser = async (req, res) => {
-  try {
-    const { name, password } = req.body;
-    const saltRounds = 10;
-    const salt = bcrypt.genSaltSync(saltRounds);
-    const hash = bcrypt.hashSync(password, salt);
-    const user = await User.create({ name, password, hashPassword: hash });
-    res.status(200).json({ data: user });
-  } catch (e) {
-    console.error(e);
   }
 };
 
@@ -40,9 +26,11 @@ export const updateUser = async (req, res) => {
 
 export const deleteUser = async (req, res) => {
   try {
-    const user = await User.findByIdAndDelete(req.user._id).exec();
-    res.status(200).json();
+    const _id = req.user._id;
+    const user = await User.findByIdAndDelete(_id).exec();
+    res.status(200).json({ data: user });
   } catch (e) {
     console.error(e);
+    res.status(400).end();
   }
 };
