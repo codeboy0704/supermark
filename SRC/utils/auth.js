@@ -1,7 +1,7 @@
 import jwt from "jsonwebtoken";
 import { config } from "../config/dev";
 import User from "../user/usermodel";
-
+import bcrypt from "bcrypt";
 export const passwordValidation = ({ password }) => {
   const regularExpression =
     /^(?=.*[0-9])(?=.*[!@#$%^&*_:])[a-zA-Z0-9!@#$%^&*_:]{6,16}$/;
@@ -17,9 +17,20 @@ export const passwordValidation = ({ password }) => {
   return true;
 };
 
+export function verifyPassword(password, hashPassword) {
+  return new Promise((resolve, reject) => {
+    bcrypt.compare(password, hashPassword, (err, same) => {
+      if (err) {
+        return reject(err);
+      }
+      resolve(same);
+    });
+  });
+}
+
 export const newToken = (user) => {
   return jwt.sign({ id: user.id }, config.ACCESS_TOKEN_SECRET, {
-    expiresIn: "1d",
+    expiresIn: "3min",
   });
 };
 
@@ -59,8 +70,9 @@ export const signup = async (req, res, next) => {
     const user = await User.create(userData);
     const token = newToken(user);
 
-    res.status(201).json({ data: token, status: true });
+    res.status(201).json({ data: token });
   } catch (e) {
+    console.error(e);
     const err = {
       status: e.status,
       message: "User Already Exist",
@@ -69,7 +81,7 @@ export const signup = async (req, res, next) => {
   }
 };
 
-export const signin = async (req, res) => {
+export const signin = async (req, res, next) => {
   const { username, password } = req.body;
   if (!username || !password) {
     return res.status(400).send({
@@ -88,7 +100,7 @@ export const signin = async (req, res) => {
     });
   }
 
-  const user = User.findOne({ username: username }).exec();
+  const user = await User.findOne({ name: username }).exec();
   if (!user) {
     return res.status(401).send({
       message: "The user don't exist",
@@ -97,7 +109,8 @@ export const signin = async (req, res) => {
   }
 
   try {
-    const match = await User.checkPassword(password);
+    console.log(user);
+    const match = await verifyPassword(password, user.password);
     if (!match) {
       return res.status(401).send({
         message: "Incorrect password",
@@ -105,11 +118,11 @@ export const signin = async (req, res) => {
       });
     }
     const token = newToken(user);
-    req.session.isAuth = true;
     return res.status(201).send({ token });
   } catch (e) {
-    const error = { status: 401, message: "Not Auth" };
-    next(error);
+    console.error(e);
+    // const error = { status: 401, message: "Not Auth" };
+    // next(error);
   }
 };
 

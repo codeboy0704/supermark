@@ -3,35 +3,30 @@ import { config } from "../config/dev";
 const dotenv = require("dotenv");
 dotenv.config({ path: "config.env" });
 
-function makeNewConnection(uri) {
-  const db = mongoose.createConnection(uri, {
-    useNewUrlParser: true,
-    useUnifiedTopology: true,
-  });
-
-  db.on("error", function (error) {
-    console.log(`MongoDb :: connection ${this.name} ${JSON.stringify(error)}`);
-    db.close().catch(() =>
-      console.error(`MongoDB :: failed to close connection ${this.name}`)
-    );
-  });
-
-  db.on("connected", function () {
-    mongoose.set("debug", function (col, method, query, doc) {
-      console.log(
-        `MongoDB :: ${this.conn.name} ${col}.${method}(${JSON.stringify(
-          query
-        )},${JSON.stringify(doc)})`
-      );
+async function makeNewConnection(uri) {
+  try {
+    return mongoose.connect(uri, {
+      useNewUrlParser: true,
+      useUnifiedTopology: true,
     });
-  });
+  } catch (e) {
+    console.error(e);
+  }
 
-  db.on("disconnected", function () {
-    console.error(`MongoDB :: disconnected ${this.name}`);
-  });
+  // db.on("error", function (error) {
+  //   console.log(`MongoDb :: connection ${this.name} ${JSON.stringify(error)}`);
+  //   db.close().catch(() =>
+  //     console.error(`MongoDB :: failed to close connection ${this.name}`)
+  //   );
+  // });
 
-  return db;
+  // db.on("disconnected", function () {
+  //   console.error(`MongoDB :: disconnected ${this.name}`);
+  // });
+
+  // return db;
 }
+// export const userConnection = makeNewConnection(config.userDB);
+export default makeNewConnection;
 
-export const userConnection = makeNewConnection(config.userDB);
-export const sessionsConnection = makeNewConnection(config.sessionDB);
+// export const sessionsConnection = makeNewConnection(config.sessionDB);
