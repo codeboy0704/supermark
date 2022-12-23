@@ -5,4 +5,5 @@ export const config = {
     "mongodb+srv://Ianm27:Nas_2004_07@cluster0.85xa1ve.mongodb.net/?retryWrites=true&w=majority",
   userDB:
     "mongodb+srv://ianm07:Nas_2004_07@cluster1.qrkrwhp.mongodb.net/?retryWrites=true&w=majority",
+  sessionDB: "mongodb://localhost:27017/sessions",
 };

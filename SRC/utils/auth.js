@@ -38,15 +38,33 @@ export const signup = async (req, res, next) => {
     name: req.body.username,
     password: req.body.password,
   };
-  if (!username || !password) {
-    return res.status(400).send({ message: "User and password require" });
+  if (!username && !password) {
+    return res.status(400).json({
+      message: "User and password require man",
+      sta: { user: false, password: false },
+    });
+  } else if (!username) {
+    return res.status(400).send({
+      message: "User require",
+      sta: { user: false, password: true },
+    });
+  } else if (!password) {
+    return res.status(400).send({
+      message: "Password Require",
+      sta: { user: true, password: false },
+    });
   }
+
   try {
     const user = await User.create(userData);
     const token = newToken(user);
-    return res.status(201).json({ data: token });
+
+    res.status(201).json({ data: token, status: true });
   } catch (e) {
-    const err = { status: e.status, message: "User Already Exist" };
+    const err = {
+      status: e.status,
+      message: "User Already Exist",
+    };
     next(err);
   }
 };
@@ -54,20 +72,40 @@ export const signup = async (req, res, next) => {
 export const signin = async (req, res) => {
   const { username, password } = req.body;
   if (!username || !password) {
-    return res.status(400).send({ message: "User and password require" });
+    return res.status(400).send({
+      message: "User and password require",
+      sta: { user: false, password: false },
+    });
+  } else if (!username) {
+    return res.status(400).send({
+      message: "User require",
+      sta: { user: false, password: true },
+    });
+  } else if (!password) {
+    return res.status(400).send({
+      message: "Password require",
+      sta: { user: true, password: false },
+    });
   }
 
   const user = User.findOne({ username: username }).exec();
   if (!user) {
-    return res.status(401).send({ message: "Not Auth" });
+    return res.status(401).send({
+      message: "The user don't exist",
+      sta: { user: false, password: true },
+    });
   }
 
   try {
     const match = await User.checkPassword(password);
     if (!match) {
-      return res.status(401).send({ message: "Not auth" });
+      return res.status(401).send({
+        message: "Incorrect password",
+        sta: { user: true, password: false },
+      });
     }
     const token = newToken(user);
+    req.session.isAuth = true;
     return res.status(201).send({ token });
   } catch (e) {
     const error = { status: 401, message: "Not Auth" };

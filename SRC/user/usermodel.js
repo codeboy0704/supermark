@@ -1,5 +1,6 @@
 import mongoose from "mongoose";
 import bcrypt from "bcrypt";
+import { userConnection } from "../utils/connection";
 
 const userSchema = new mongoose.Schema(
   {
@@ -52,6 +53,6 @@ userSchema.methods.checkPassword = function (password) {
   });
 };
 
-const User = mongoose.model("user", userSchema);
+const User = userConnection.model("User", userSchema);
 
 export default User;
