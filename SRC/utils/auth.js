@@ -30,7 +30,7 @@ export function verifyPassword(password, hashPassword) {
 
 export const newToken = (user) => {
   return jwt.sign({ id: user.id }, config.ACCESS_TOKEN_SECRET, {
-    expiresIn: "3min",
+    expiresIn: "1d",
   });
 };
 
