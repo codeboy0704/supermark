@@ -2,6 +2,7 @@ import jwt from "jsonwebtoken";
 import { config } from "../config/dev";
 import User from "../user/usermodel";
 import bcrypt from "bcrypt";
+import Family from "../family/family.model";
 export const passwordValidation = ({ password }) => {
   const regularExpression =
     /^(?=.*[0-9])(?=.*[!@#$%^&*_:])[a-zA-Z0-9!@#$%^&*_:]{6,16}$/;
@@ -47,7 +48,7 @@ export const signup = async (req, res, next) => {
   const { username, password } = req.body;
   const userData = {
     name: req.body.username,
-    password: req.body.password,
+    password: password,
   };
   if (!username && !password) {
     return res.status(400).json({
@@ -126,13 +127,10 @@ export const signin = async (req, res, next) => {
   }
 };
 
-export const protect = async (req, res, next) => {
-  if (!req.headers.authorization) {
-    return res.status(401).end();
-  }
-  let token = req.headers.authorization.split("Bearer ")[1];
+export const verifyUser = async (req, res, next) => {
+  const token = req.headers["authorization"];
   if (!token) {
-    return res.status(401).end();
+    res.status(403).send({ message: "Not auth" });
   }
   try {
     const payload = await verifyToken(token);
@@ -141,8 +139,31 @@ export const protect = async (req, res, next) => {
       .lean()
       .exec();
     req.user = user;
+    res.status(201).send({ message: "Auth", data: user });
     next();
   } catch (e) {
+    console.error(e);
     next(e);
   }
 };
+
+// export const protect = async (req, res, next) => {
+//   if (!req.headers.authorization) {
+//     return res.status(401).end();
+//   }
+//   let token = req.headers.authorization.split("Bearer ")[1];
+//   if (!token) {
+//     return res.status(401).end();
+//   }
+//   try {
+//     const payload = await verifyToken(token);
+//     const user = await User.findById(payload.id)
+//       .select("-password")
+//       .lean()
+//       .exec();
+//     req.user = user;
+//     next();
+//   } catch (e) {
+//     next(e);
+//   }
+// };

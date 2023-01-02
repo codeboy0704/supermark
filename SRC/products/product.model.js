@@ -19,7 +19,7 @@ const productSchema = new mongoose.Schema(
       type: Number,
       trim: true,
     },
-    createdBy: {
+    family: {
       type: mongoose.SchemaTypes.ObjectId,
       ref: "family",
       required: true,

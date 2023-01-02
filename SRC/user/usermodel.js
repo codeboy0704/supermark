@@ -17,6 +17,11 @@ const userSchema = new mongoose.Schema(
       required: [true, "You need to provide a password"],
       validate: [],
     },
+    family: {
+      type: mongoose.SchemaTypes.ObjectId,
+      ref: "family",
+      trim: true,
+    },
     settings: {
       type: String,
       default: "dark",
@@ -42,17 +47,17 @@ userSchema.pre("save", function (next) {
   });
 });
 
-userSchema.methods.checkPassword = function (password) {
-  const passwordHash = this.password;
-  return new Promise((resolve, reject) => {
-    bcrypt.compare(password, passwordHash, (err, same) => {
-      if (err) {
-        return reject(err);
-      }
-      resolve(same);
-    });
-  });
-};
+// userSchema.methods.checkPassword = function (password) {
+//   const passwordHash = this.password;
+//   return new Promise((resolve, reject) => {
+//     bcrypt.compare(password, passwordHash, (err, same) => {
+//       if (err) {
+//         return reject(err);
+//       }
+//       resolve(same);
+//     });
+//   });
+// };
 
 const userConnection = makeNewConnection(config.userDB)
   .then(() => console.log(`Connected to userDB`))
