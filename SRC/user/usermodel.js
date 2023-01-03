@@ -22,14 +22,6 @@ const userSchema = new mongoose.Schema(
       ref: "family",
       trim: true,
     },
-    settings: {
-      type: String,
-      default: "dark",
-    },
-    notifications: {
-      type: Boolean,
-      default: true,
-    },
   },
   { timestamps: true }
 );

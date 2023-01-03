@@ -1,6 +1,12 @@
 import { Router } from "express";
 const router = Router();
-import { createFamily, getFamily } from "./family.controllers";
-router.post("/", createFamily).get("/", getFamily);
-
+import {
+  createFamily,
+  getFamily,
+  getFamilyMember,
+  getMany,
+} from "./family.controllers";
+router.get("/", getFamily).post("/", createFamily);
+router.get("/many", getMany);
+router.post("/member", getFamilyMember);
 export default router;
