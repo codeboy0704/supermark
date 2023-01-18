@@ -37,21 +37,31 @@ export const createFamily = async (req, res, next) => {
 };
 
 export const getFamily = async (req, res, next) => {
+  const { user } = req.body;
+  console.log(req);
+  if (!user) {
+    return res.status(400).json({ message: "No user data provided" });
+  }
+  const userDoc = await User.findById(user._id);
+  if (!userDoc) {
+    return res.status(404).json({ message: "Owner not found" });
+  }
   try {
-    const { user, name } = req.body;
-    const userDoc = await User.findOne({ name: user });
     const doc = await Family.findOne({
       createdBy: userDoc._id,
-      name: name,
+      _id: user.family,
     });
     if (!doc) {
-      return res.status(404).send({ message: "Family not found" });
+      console.log(id);
+      res.status(404).send({ message: "Family not found" });
     }
-    res.status(201).json({ data: doc });
+    return res.status(201).json({ data: doc });
   } catch (e) {
-    console.error(e);
-    res.status(400).end();
-    next(e);
+    const err = {
+      status: e.status,
+      message: e.message,
+    };
+    next(err);
   }
 };
 

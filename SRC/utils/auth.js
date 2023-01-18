@@ -130,7 +130,7 @@ export const signin = async (req, res, next) => {
 export const verifyUser = async (req, res, next) => {
   const token = req.headers["authorization"];
   if (!token) {
-    res.status(403).send({ message: "Not auth" });
+    res.status(401).send({ message: "Not auth" });
   }
   try {
     const payload = await verifyToken(token);
@@ -139,8 +139,7 @@ export const verifyUser = async (req, res, next) => {
       .lean()
       .exec();
     req.user = user;
-    res.status(201).send({ message: "Auth", data: user });
-    next();
+    res.status(201).send({ message: "Auth", data: user, login: true });
   } catch (e) {
     console.error(e);
     next(e);
