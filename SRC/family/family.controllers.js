@@ -12,7 +12,7 @@ export const createFamily = async (req, res, next) => {
   try {
     const admi = await User.findOne({ name: username }).lean().exec();
     if (!admi) {
-      res.status(403).send({ message: "User not found" });
+      return res.status(403).send({ message: "User not found" });
     }
     const family = await Family.create({
       name: familyName,
@@ -31,8 +31,11 @@ export const createFamily = async (req, res, next) => {
       .status(201)
       .json({ data: { family: family, admiInfo: updated } });
   } catch (e) {
-    console.error(e);
-    next(e);
+    const err = {
+      message: "Problem creating the family, try again later",
+      status: 204,
+    };
+    next(err);
   }
 };
 
@@ -66,11 +69,11 @@ export const getFamily = async (req, res, next) => {
 };
 
 export const getFamilyMember = async (req, res, next) => {
-  const { familyName } = req.body;
+  const { family } = req.body;
   try {
-    const family = await Family.findOne({ name: familyName });
-    if (!family) {
-      res.status(403).send({ message: "Family not found" });
+    const findFamily = await Family.findOne({ name: family.name });
+    if (!findFamily) {
+      res.status(403).json({ message: "Family not found" });
     }
     const users = await User.findOne({ family: family._id });
     res.status(201).json({ data: users || "No users" });
@@ -85,7 +88,10 @@ export const getMany = async (req, res, next) => {
     const families = await Family.find({}).lean().exec();
     res.status(201).json({ data: families });
   } catch (e) {
-    console.error(e);
-    next(e);
+    const err = {
+      message: "Problem getting the families",
+      status: e.status,
+    };
+    next(err);
   }
 };

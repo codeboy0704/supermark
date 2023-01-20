@@ -138,8 +138,11 @@ export const verifyUser = async (req, res, next) => {
       .select("-password")
       .lean()
       .exec();
+    const family = await Family.findById(user.family._id);
+    console.log(family);
     req.user = user;
-    res.status(201).send({ message: "Auth", data: user, login: true });
+    console.log(user);
+    res.status(201).send({ message: "Auth", data: { user, family } });
   } catch (e) {
     console.error(e);
     next(e);
