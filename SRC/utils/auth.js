@@ -138,34 +138,22 @@ export const verifyUser = async (req, res, next) => {
       .select("-password")
       .lean()
       .exec();
-    const family = await Family.findById(user.family._id);
-    console.log(family);
     req.user = user;
-    console.log(user);
-    res.status(201).send({ message: "Auth", data: { user, family } });
+    if (!user.family) {
+      return res.status(201).json({ message: "Auth", data: { user, family } });
+    }
+    const family = await Family.findById(user.family._id);
+    return res.status(201).send({ message: "Auth", data: { user, family } });
   } catch (e) {
     console.error(e);
     next(e);
   }
 };
 
-// export const protect = async (req, res, next) => {
-//   if (!req.headers.authorization) {
-//     return res.status(401).end();
-//   }
-//   let token = req.headers.authorization.split("Bearer ")[1];
-//   if (!token) {
-//     return res.status(401).end();
-//   }
-//   try {
-//     const payload = await verifyToken(token);
-//     const user = await User.findById(payload.id)
-//       .select("-password")
-//       .lean()
-//       .exec();
-//     req.user = user;
-//     next();
-//   } catch (e) {
-//     next(e);
-//   }
-// };
+export function isAdmin(req, res, next) {
+  const { user } = req.body;
+  if (user.role == 5077) {
+    return next();
+  }
+  return res.status(403).send("Only the admin can access this content");
+}

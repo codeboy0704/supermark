@@ -3,7 +3,7 @@ import bcrypt from "bcrypt";
 import makeNewConnection from "../utils/connection";
 import { config } from "../config/dev";
 
-const userSchema = new mongoose.Schema(
+export const userSchema = new mongoose.Schema(
   {
     name: {
       type: String,
@@ -21,6 +21,10 @@ const userSchema = new mongoose.Schema(
       type: mongoose.SchemaTypes.ObjectId,
       ref: "family",
       trim: true,
+    },
+    roles: {
+      type: Number,
+      default: 5077,
     },
   },
   { timestamps: true }

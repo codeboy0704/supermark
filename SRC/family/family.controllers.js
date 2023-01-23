@@ -1,6 +1,12 @@
 import User from "../user/usermodel";
 import Family from "./family.model";
 
+const ROLES_LIST = {
+  admi: 5077,
+  editor: 2072,
+  user: 1022,
+};
+
 export const createFamily = async (req, res, next) => {
   const { familyName, password, username } = req.body;
 
@@ -23,6 +29,7 @@ export const createFamily = async (req, res, next) => {
       admi._id,
       {
         family: family._id,
+        role: ROLES_LIST.admi,
       },
       { new: true }
     );

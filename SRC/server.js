@@ -9,7 +9,7 @@ import { config } from "./config/dev";
 import { protect, signin, signup, verifyToken, verifyUser } from "./utils/auth";
 import User from "./user/usermodel";
 import Family from "./family/family.model";
-import familyRouter from "./family/family.router";
+import familyRouter from "./family/family.router.js";
 import errorHandler from "./errorHandler";
 
 const port = 8000;
