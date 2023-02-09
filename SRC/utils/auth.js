@@ -150,10 +150,27 @@ export const verifyUser = async (req, res, next) => {
   }
 };
 
-export function isAdmin(req, res, next) {
-  const { user } = req.body;
-  if (user.role == 5077) {
-    return next();
+export async function isAdmin(req, res, next) {
+  const { user, family } = req.body;
+  if ((!user, !family))
+    return res
+      .status(404)
+      .send({ message: "You need to provide the user and the family data" });
+  try {
+    const doc = await Family.findOne({ name: family.name }).lean().exec();
+    const findUser = await User.findOne({ name: user.name }).lean().exec();
+    if (!doc) return res.status(404).send({ message: "Family not found" });
+    if (!findUser) return res.status(404).send({ message: "User not found" });
+    if (doc.members.includes(findUser._id)) {
+      return next();
+    } else {
+      return res.status(401).send({ message: "You are not the admin" });
+    }
+  } catch (e) {
+    const err = {
+      status: e.status,
+      message: "Something went wrong",
+    };
+    next(err);
   }
-  return res.status(403).send("Only the admin can access this content");
 }

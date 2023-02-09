@@ -2,8 +2,8 @@ import mongoose from "mongoose";
 import { config } from "../config/dev";
 import makeNewConnection from "../utils/connection";
 import bcrypt from "bcrypt";
-import { userSchema } from "../user/usermodel";
-const familySchema = new mongoose.Schema(
+import { userSchema } from "../user/usermodel.js";
+export const familySchema = new mongoose.Schema(
   {
     name: {
       type: String,
@@ -19,12 +19,12 @@ const familySchema = new mongoose.Schema(
       ref: "user",
       require: [true, "You need to provide an admi"],
     },
-    members: {
-      admi: {
+    members: [
+      {
         type: mongoose.SchemaTypes.ObjectId,
+        ref: "user",
       },
-      users: [userSchema],
-    },
+    ],
   },
   { timestamps: true }
 );

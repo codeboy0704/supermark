@@ -8,39 +8,76 @@ const ROLES_LIST = {
 };
 
 export const createFamily = async (req, res, next) => {
-  const { familyName, password, username } = req.body;
-
-  const existedFamily = await Family.findOne({ name: familyName });
-  if (existedFamily) {
-    return res.status(400).send({ message: "Family Name already in use" });
+  const { family, user } = req.body;
+  if (!family || !user) {
+    return res.status(400).json({ message: "No user or family data provided" });
   }
 
   try {
-    const admi = await User.findOne({ name: username }).lean().exec();
+    const existedFamily = await Family.findOne({ name: family.name })
+      .lean()
+      .exec();
+    if (existedFamily) {
+      return res.status(400).send({ message: "Family name already in use" });
+    }
+    const admi = await User.findOne({ name: user.name }).lean().exec();
     if (!admi) {
       return res.status(403).send({ message: "User not found" });
     }
-    const family = await Family.create({
-      name: familyName,
-      password,
+    const newFamily = await Family.create({
+      name: family.name,
+      password: family.password,
       createdBy: admi._id,
+      members: {
+        admi: admi._id,
+        $push: { members: admi._id },
+      },
     });
     const updated = await User.findByIdAndUpdate(
       admi._id,
       {
-        family: family._id,
         role: ROLES_LIST.admi,
       },
       { new: true }
-    );
-    await family.save();
+    )
+      .lean()
+      .exec();
+    await newFamily.save();
     return res
       .status(201)
-      .json({ data: { family: family, admiInfo: updated } });
+      .json({ data: { family: newFamily, admiInfo: updated } });
   } catch (e) {
     const err = {
       message: "Problem creating the family, try again later",
       status: 204,
+    };
+    next(err);
+  }
+};
+
+export const addMember = async (req, res, next) => {
+  const { user, family, member } = req.body;
+  if (!user || !family || !member) {
+    return res.status(400).json({ message: "No user data provided" });
+  }
+  try {
+    const doc = await User.findOne({ name: user.name }).lean().exec();
+    const foundFamily = await Family.findOne({ name: family.name });
+    const foundMember = await User.findOne({ name: member.name }).lean().exec();
+    // if (foundFamily.members.admi == doc._id) {
+    //   const uptadeFamily = await Family.findByIdAndUpdate(
+    //     doc._id,
+    //     {
+    //       $push: { members: foundMember._id },
+    //     },
+    //     { new: true }
+    //   );
+    //   return res.status(201).json({ data: uptadeFamily });
+    // }
+  } catch (e) {
+    const err = {
+      message: "Something went wrong, try again later",
+      status: 400,
     };
     next(err);
   }
@@ -66,6 +103,23 @@ export const getFamily = async (req, res, next) => {
       res.status(404).send({ message: "Family not found" });
     }
     return res.status(201).json({ data: doc });
+  } catch (e) {
+    const err = {
+      status: e.status,
+      message: e.message,
+    };
+    next(err);
+  }
+};
+
+export const deleteFamily = async (req, res, next) => {
+  const { family } = req.body;
+  try {
+    const doc = await Family.findOneAndDelete({ _id: family._id });
+    if (!doc) {
+      res.status(404).send({ message: "Family not found" });
+    }
+    res.status(201).json({ data: doc });
   } catch (e) {
     const err = {
       status: e.status,

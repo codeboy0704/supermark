@@ -1,7 +1,8 @@
-import mongoose from "mongoose";
+import mongoose, { Schema } from "mongoose";
 import bcrypt from "bcrypt";
 import makeNewConnection from "../utils/connection";
 import { config } from "../config/dev";
+import { familySchema } from "../family/family.model";
 
 export const userSchema = new mongoose.Schema(
   {
@@ -17,12 +18,7 @@ export const userSchema = new mongoose.Schema(
       required: [true, "You need to provide a password"],
       validate: [],
     },
-    family: {
-      type: mongoose.SchemaTypes.ObjectId,
-      ref: "family",
-      trim: true,
-    },
-    roles: {
+    role: {
       type: Number,
       default: 5077,
     },
