@@ -12,9 +12,9 @@ import {
 } from "./family.controllers";
 router.get("/", getFamily);
 router.post("/create", createFamily);
-router.post("/member/add", isAdmin, addMember);
+router.post("/add/member", isAdmin, addMember);
 router.delete("/", isAdmin, deleteFamily);
 router.get("/many", getMany);
-router.post("/member", isAdmin, getFamilyMember);
+router.get("/member", isAdmin, getFamilyMember);
 router.use(errorHandler);
 export default router;

@@ -2,7 +2,6 @@ import mongoose from "mongoose";
 import { config } from "../config/dev";
 import makeNewConnection from "../utils/connection";
 import bcrypt from "bcrypt";
-import { userSchema } from "../user/usermodel.js";
 export const familySchema = new mongoose.Schema(
   {
     name: {

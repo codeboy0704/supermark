@@ -30,7 +30,7 @@ export const createFamily = async (req, res, next) => {
       createdBy: admi._id,
       members: [{ _id: admi._id, role: ROLES_LIST.admi }],
     });
-    const updated = await User.findByIdAndUpdate(
+    const updatedUser = await User.findByIdAndUpdate(
       admi._id,
       {
         $push: { families: newFamily._id },
@@ -42,7 +42,7 @@ export const createFamily = async (req, res, next) => {
     await newFamily.save();
     return res
       .status(201)
-      .json({ data: { family: newFamily, admiInfo: updated } });
+      .json({ data: { family: newFamily, admiInfo: updatedUser } });
   } catch (e) {
     const err = {
       message: "Problem creating the family, try again later",
@@ -134,14 +134,42 @@ export const getFamily = async (req, res, next) => {
   }
 };
 
-export const deleteFamily = async (req, res, next) => {
-  const { family } = req.body;
+export const changeRole = async (req, res, next) => {
+  const { family, user, member } = req.body;
   try {
-    const doc = await Family.findOneAndDelete({ _id: family._id });
+    const foundFamily = await Family.findOne({ name: family.name })
+      .lean()
+      .exec();
+    const foundUser = await User.findOne({ name: user.name }).lean().exec();
+    const foundMember = await User.findOne({ name: member.name }).lean().exec();
+    if (!foundFamily) {
+      return res.status(404).send({ message: "Family not found" });
+    }
+    if (!foundUser) {
+      return res.status(404).send({ message: "User not found" });
+    }
+    if (!foundMember) {
+      return res.status(404).send({ message: "Member not found" });
+    }
+    if (foundFamily.members.includes(member._id)) {
+    }
+  } catch (e) {
+    const err = {
+      status: e.status,
+      message: e.message,
+    };
+    next(err);
+  }
+};
+
+export const deleteFamily = async (req, res, next) => {
+  const { family, user } = req.body;
+  try {
+    const doc = await Family.findOneAndDelete({ name: family.name });
     if (!doc) {
       res.status(404).send({ message: "Family not found" });
     }
-    res.status(201).json({ data: doc });
+    return res.status(201).json({ data: doc });
   } catch (e) {
     const err = {
       status: e.status,
@@ -152,14 +180,14 @@ export const deleteFamily = async (req, res, next) => {
 };
 
 export const getFamilyMember = async (req, res, next) => {
-  const { family } = req.body;
+  const { family, user } = req.body;
   try {
-    const findFamily = await Family.findOne({ name: family.name });
-    if (!findFamily) {
+    const foundFamily = await Family.findOne({ name: family.name });
+    if (!foundFamily) {
       res.status(403).json({ message: "Family not found" });
     }
-    const users = await User.findOne({ family: family._id });
-    res.status(201).json({ data: users || "No users" });
+    const members = foundFamily.members;
+    res.status(201).json({ data: members || "No members" });
   } catch (e) {
     console.error(e);
     next(e);
