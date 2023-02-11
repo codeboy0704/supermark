@@ -18,10 +18,12 @@ export const userSchema = new mongoose.Schema(
       required: [true, "You need to provide a password"],
       validate: [],
     },
-    role: {
-      type: Number,
-      default: 5077,
-    },
+    families: [
+      {
+        type: Schema.Types.ObjectId,
+        ref: "family",
+      },
+    ],
   },
   { timestamps: true }
 );

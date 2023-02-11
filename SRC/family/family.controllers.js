@@ -28,15 +28,12 @@ export const createFamily = async (req, res, next) => {
       name: family.name,
       password: family.password,
       createdBy: admi._id,
-      members: {
-        admi: admi._id,
-        $push: { members: admi._id },
-      },
+      members: [{ _id: admi._id, role: ROLES_LIST.admi }],
     });
     const updated = await User.findByIdAndUpdate(
       admi._id,
       {
-        role: ROLES_LIST.admi,
+        $push: { families: newFamily._id },
       },
       { new: true }
     )
@@ -58,22 +55,47 @@ export const createFamily = async (req, res, next) => {
 export const addMember = async (req, res, next) => {
   const { user, family, member } = req.body;
   if (!user || !family || !member) {
-    return res.status(400).json({ message: "No user data provided" });
+    return res.status(400).json({
+      message: "You need to provide the user, family and the member data",
+    });
   }
   try {
-    const doc = await User.findOne({ name: user.name }).lean().exec();
+    const foundUser = await User.findOne({ name: user.name }).lean().exec();
     const foundFamily = await Family.findOne({ name: family.name });
     const foundMember = await User.findOne({ name: member.name }).lean().exec();
-    // if (foundFamily.members.admi == doc._id) {
-    //   const uptadeFamily = await Family.findByIdAndUpdate(
-    //     doc._id,
-    //     {
-    //       $push: { members: foundMember._id },
-    //     },
-    //     { new: true }
-    //   );
-    //   return res.status(201).json({ data: uptadeFamily });
-    // }
+    if (!foundUser) {
+      return res
+        .status(404)
+        .send({ message: "User not valid or doesn't exist" });
+    }
+    if (!foundFamily) {
+      return res.status(404).send({ message: "Ooops...Family not found" });
+    }
+    if (!foundMember) {
+      return res
+        .status(404)
+        .send({ message: "Oops...Not valid member to add" });
+    }
+    if (foundFamily.members.includes(foundMember._id)) {
+      return res.status(400).send({ message: "Member already in the family" });
+    }
+    if (foundFamily.members.includes(foundUser._id)) {
+      const updatedFamily = await Family.findByIdAndUpdate(
+        foundFamily._id,
+        {
+          $push: { members: { _id: foundMember._id, role: member.role } },
+        },
+        { new: true }
+      );
+      const updatedMember = await User.findByIdAndUpdate(
+        foundMember._id,
+        {
+          $push: { families: updatedFamily._id },
+        },
+        { new: true }
+      );
+      return res.status(201).json({ data: { updatedFamily, updatedMember } });
+    }
   } catch (e) {
     const err = {
       message: "Something went wrong, try again later",

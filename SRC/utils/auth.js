@@ -161,15 +161,14 @@ export async function isAdmin(req, res, next) {
     const findUser = await User.findOne({ name: user.name }).lean().exec();
     if (!doc) return res.status(404).send({ message: "Family not found" });
     if (!findUser) return res.status(404).send({ message: "User not found" });
-    if (doc.members.includes(findUser._id)) {
+    if (doc.createdBy.equals(findUser._id)) {
       return next();
-    } else {
-      return res.status(401).send({ message: "You are not the admin" });
     }
+    return res.status(401).send({ message: "You are not the admin" });
   } catch (e) {
     const err = {
       status: e.status,
-      message: "Something went wrong",
+      message: e.message,
     };
     next(err);
   }

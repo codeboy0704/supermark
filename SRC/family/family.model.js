@@ -21,8 +21,11 @@ export const familySchema = new mongoose.Schema(
     },
     members: [
       {
-        type: mongoose.SchemaTypes.ObjectId,
-        ref: "user",
+        type: Object,
+        role: {
+          type: Number,
+          default: 5077,
+        },
       },
     ],
   },
