@@ -13,6 +13,11 @@ export const userSchema = new mongoose.Schema(
       validate: [],
       sparse: true,
     },
+    email: {
+      type: String,
+      required: [true, "You need to provide a email"],
+      unique: true,
+    },
     password: {
       type: String,
       required: [true, "You need to provide a password"],

@@ -6,7 +6,14 @@ import { json, urlencoded } from "body-parser";
 import cors from "cors";
 import userRouter from "./user/user.router";
 import { config } from "./config/dev";
-import { protect, signin, signup, verifyToken, verifyUser } from "./utils/auth";
+import {
+  logOut,
+  protect,
+  signin,
+  signup,
+  verifyToken,
+  verifyUser,
+} from "./utils/auth";
 import User from "./user/usermodel";
 import Family from "./family/family.model";
 import familyRouter from "./family/family.router.js";
@@ -40,6 +47,7 @@ require("dotenv").config();
 app.use(morgan("dev"));
 app.post("/api/signup", signup);
 app.post("/api/login", signin);
+app.delete("/api/logout", logOut);
 app.use("/api/user", userRouter);
 app.use("/api/family", familyRouter);
 app.post("/api", verifyUser);

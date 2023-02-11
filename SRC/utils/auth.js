@@ -44,16 +44,38 @@ export const verifyToken = (token) => {
   });
 };
 
+export const logOut = async (req, res, next) => {
+  let token = req.headers["token"];
+  try {
+    let randomNumberToAppend = toString(Math.floor(Math.random() * 1000 + 1));
+    let randomIndex = Math.floor(Math.random() * 10 + 1);
+    let hashedRandomNumberToAppend = await bcrypt.hash(
+      randomNumberToAppend,
+      10
+    );
+    token = token + hashedRandomNumberToAppend;
+    res.status(201).json({ message: "Log out successfully", token });
+  } catch (e) {
+    console.error(e);
+    const err = {
+      status: e.status,
+      message: "Log out failed",
+    };
+    next(err);
+  }
+};
+
 export const signup = async (req, res, next) => {
-  const { username, password } = req.body;
+  const { username, password, email } = req.body;
   const userData = {
     name: req.body.username,
     password: password,
+    email: email,
   };
   if (!username && !password) {
     return res.status(400).json({
-      message: "User and password require man",
-      sta: { user: false, password: false },
+      message: "User, password & email require",
+      sta: { user: false, password: false, email: false },
     });
   } else if (!username) {
     return res.status(400).send({
@@ -64,6 +86,11 @@ export const signup = async (req, res, next) => {
     return res.status(400).send({
       message: "Password Require",
       sta: { user: true, password: false },
+    });
+  } else if (!email) {
+    return res.status(400).send({
+      message: "Email Require",
+      sta: { user: true, password: true, email: false },
     });
   }
 
@@ -133,6 +160,7 @@ export const verifyUser = async (req, res, next) => {
     res.status(401).send({ message: "Not auth" });
   }
   try {
+    console.log("First");
     const payload = await verifyToken(token);
     const user = await User.findById(payload.id)
       .select("-password")
@@ -155,7 +183,7 @@ export async function isAdmin(req, res, next) {
   if ((!user, !family))
     return res
       .status(404)
-      .send({ message: "You need to provide the user and the family data" });
+      .send({ message: "You need to provide the user and family data" });
   try {
     const doc = await Family.findOne({ name: family.name }).lean().exec();
     const findUser = await User.findOne({ name: user.name }).lean().exec();
