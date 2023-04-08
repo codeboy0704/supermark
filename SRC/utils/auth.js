@@ -59,7 +59,7 @@ export const logOut = async (req, res, next) => {
     console.error(e);
     const err = {
       status: e.status,
-      message: "Log out failed",
+      message: "Log out failed, try again later",
     };
     next(err);
   }
@@ -148,9 +148,9 @@ export const signin = async (req, res, next) => {
     const token = newToken(user);
     return res.status(201).send({ token });
   } catch (e) {
-    console.error(e);
-    // const error = { status: 401, message: "Not Auth" };
-    // next(error);
+    // console.error(e);
+    const error = { status: 401, message: "Not Auth" };
+    next(error);
   }
 };
 
@@ -160,7 +160,6 @@ export const verifyUser = async (req, res, next) => {
     res.status(401).send({ message: "Not auth" });
   }
   try {
-    console.log("First");
     const payload = await verifyToken(token);
     const user = await User.findById(payload.id)
       .select("-password")
@@ -185,14 +184,17 @@ export async function isAdmin(req, res, next) {
       .status(404)
       .send({ message: "You need to provide the user and family data" });
   try {
-    const doc = await Family.findOne({ name: family.name }).lean().exec();
-    const findUser = await User.findOne({ name: user.name }).lean().exec();
-    if (!doc) return res.status(404).send({ message: "Family not found" });
+    const familyDoc = await Family.findOne({ name: family.name }).lean().exec();
+    const userDoc = await User.findOne({ name: user.name }).lean().exec();
+    if (!familyDoc)
+      return res.status(404).send({ message: "Family not found" });
     if (!findUser) return res.status(404).send({ message: "User not found" });
-    if (doc.createdBy.equals(findUser._id)) {
+    if (familyDoc.createdBy.equals(userDoc._id)) {
       return next();
     }
-    return res.status(401).send({ message: "You are not the admin" });
+    return res
+      .status(401)
+      .send({ message: "You are not the admin of this family" });
   } catch (e) {
     const err = {
       status: e.status,

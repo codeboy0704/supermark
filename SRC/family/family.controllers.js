@@ -107,7 +107,6 @@ export const addMember = async (req, res, next) => {
 
 export const getFamily = async (req, res, next) => {
   const { user } = req.body;
-  console.log(req);
   if (!user) {
     return res.status(400).json({ message: "No user data provided" });
   }
@@ -135,18 +134,18 @@ export const getFamily = async (req, res, next) => {
 };
 
 export const changeRole = async (req, res, next) => {
-  const { family, user, member } = req.body;
+  const { family, admi, member } = req.body;
   try {
     const foundFamily = await Family.findOne({ name: family.name })
       .lean()
       .exec();
-    const foundUser = await User.findOne({ name: user.name }).lean().exec();
+    const foundAdmin = await User.findOne({ name: admi.name }).lean().exec();
     const foundMember = await User.findOne({ name: member.name }).lean().exec();
     if (!foundFamily) {
       return res.status(404).send({ message: "Family not found" });
     }
-    if (!foundUser) {
-      return res.status(404).send({ message: "User not found" });
+    if (!foundAdmin) {
+      return res.status(404).send({ message: "Admin not found" });
     }
     if (!foundMember) {
       return res.status(404).send({ message: "Member not found" });
@@ -163,7 +162,7 @@ export const changeRole = async (req, res, next) => {
 };
 
 export const deleteFamily = async (req, res, next) => {
-  const { family, user } = req.body;
+  const { family, admi } = req.body;
   try {
     const doc = await Family.findOneAndDelete({ name: family.name });
     if (!doc) {
@@ -200,7 +199,7 @@ export const getMany = async (req, res, next) => {
     res.status(201).json({ data: families });
   } catch (e) {
     const err = {
-      message: "Problem getting the families",
+      message: "There was a problem getting the families",
       status: e.status,
     };
     next(err);
