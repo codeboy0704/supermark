@@ -32,28 +32,25 @@ app.use(
     credentials: true,
   })
 );
-app.use(
-  session({
-    secret: "Key that will sign",
-    resave: false, //for every req to the server we want to create a new session
-    saveUninitialized: false,
-    store: store,
-  })
-);
 
-app.use(urlencoded({ extended: true }));
-app.use(json());
+
 require("dotenv").config();
 app.use(morgan("dev"));
+app.use(urlencoded({ extended: true }));
+app.use(json());
+app.use("/api/user", userRouter);
+app.use("/api/family", familyRouter);
+app.get("/api", verifyUser);
 app.post("/api/signup", signup);
 app.post("/api/login", signin);
 app.delete("/api/logout", logOut);
-app.use("/api/user", userRouter);
-app.use("/api/family", familyRouter);
-app.post("/api", verifyUser);
-app.use(errorHandler);
+app.use("/", errorHandler);
 
-const start = async () => {
+process.on("uncaughtException", (err) => {
+  console.log(err.name, err.message);
+})
+
+const start = () => {
   try {
     app.listen(port, () => {
       console.log(`Server up on port ${port}`);

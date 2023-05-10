@@ -3,7 +3,7 @@ import { config } from "../config/dev";
 const dotenv = require("dotenv");
 dotenv.config({ path: "config.env" });
 
-async function makeNewConnection(uri) {
+async function makeNewConnection(uri, handleError) {
   try {
     return mongoose.connect(uri, {
       useNewUrlParser: true,
