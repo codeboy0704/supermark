@@ -1,19 +1,19 @@
 import mongoose from "mongoose";
-import { config } from "../config/dev";
+import { MongoClient, ServerApiVersion } from "mongodb";
 const dotenv = require("dotenv");
 dotenv.config({ path: "config.env" });
 
-async function makeNewConnection(uri, handleError) {
+
+async function makeConnection() {
   try {
-    return mongoose.connect(uri, {
+     await mongoose.connect(process.env.DB_URI, {
       useNewUrlParser: true,
       useUnifiedTopology: true,
-    });
-  } catch (e) {
-    console.error(e);
+    })
+    console.log("Connected correctly to server");
+  }catch(e){
+    console.error(e)
   }
 }
-// export const userConnection = makeNewConnection(config.userDB);
-export default makeNewConnection;
 
-// export const sessionsConnection = makeNewConnection(config.sessionDB);
+export default makeConnection;
