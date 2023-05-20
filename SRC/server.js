@@ -39,7 +39,7 @@ app.use(morgan("dev"));
 app.use(urlencoded({ extended: true }));
 app.use(json());
 app.use("/api/user", userRouter);
-app.use("/api/product/", productRouter)
+app.use("/api/product", productRouter)
 app.get("/api", verifyUser);
 app.post("/api/signup", signup);
 app.post("/api/login", signin);

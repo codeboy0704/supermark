@@ -2,6 +2,25 @@ import jwt from "jsonwebtoken";
 import { config } from "../config/dev";
 import User from "../user/usermodel";
 import bcrypt from "bcrypt";
+export const userValidation = async (req,res,next) =>{
+    const {user, password} = req.body
+    if(!user || !password){
+        return res.status(400).json({message: "User and password require to get access"})
+    }
+    try{
+      if(user == process.env.MAIN_USER_NAME && password == process.env.MAIN_USER_PASSWORD ){
+        next()
+      }else{
+        return res.status(401).json({message: "User or password incorrect, try again"})
+      }
+    }catch(e){
+      let err = {
+        status: e.status,
+        message: 'Something went wrong with the user validation'
+      }
+        next(err)
+    }
+}
 export const passwordValidation = ({ password }) => {
   const regularExpression =
     /^(?=.*[0-9])(?=.*[!@#$%^&*_:])[a-zA-Z0-9!@#$%^&*_:]{6,16}$/;
