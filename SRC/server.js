@@ -5,6 +5,7 @@ import morgan from "morgan";
 import { json, urlencoded } from "body-parser";
 import cors from "cors";
 import userRouter from "./user/user.router";
+import productRouter from "./products/product.router"
 import { config } from "./config/dev";
 import {
   logOut,
@@ -16,6 +17,7 @@ import {
 } from "./utils/auth";
 import User from "./user/usermodel";
 import errorHandler from "./errorHandler";
+import makeConnection from "./utils/connection";
 
 const port = 8000;
 const app = express();
@@ -37,6 +39,7 @@ app.use(morgan("dev"));
 app.use(urlencoded({ extended: true }));
 app.use(json());
 app.use("/api/user", userRouter);
+app.use("/api/product/", productRouter)
 app.get("/api", verifyUser);
 app.post("/api/signup", signup);
 app.post("/api/login", signin);
@@ -51,6 +54,7 @@ const start = () => {
   try {
     app.listen(port, () => {
       console.log(`Server up on port ${port}`);
+      makeConnection()
     });
   } catch (e) {
     console.error(e);

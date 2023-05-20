@@ -1,6 +1,5 @@
 import mongoose, { Schema } from "mongoose";
 import bcrypt from "bcrypt";
-import makeNewConnection from "../utils/connection";
 import { config } from "../config/dev";
 
 
@@ -51,10 +50,6 @@ userSchema.pre("save", function (next) {
 //     });
 //   });
 // };
-
-const userConnection = makeNewConnection(config.userDB)
-  .then(() => console.log(`Connected to userDB`))
-  .catch((e) => console.error(e));
 
 const User = mongoose.model("user", userSchema);
 

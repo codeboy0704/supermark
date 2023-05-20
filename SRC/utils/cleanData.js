@@ -26,3 +26,5 @@ function cleanData(){
     })
     return cleandata
 }
+
+export default cleanData;
