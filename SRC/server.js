@@ -15,8 +15,6 @@ import {
   verifyUser,
 } from "./utils/auth";
 import User from "./user/usermodel";
-import Family from "./family/family.model";
-import familyRouter from "./family/family.router.js";
 import errorHandler from "./errorHandler";
 
 const port = 8000;
@@ -39,7 +37,6 @@ app.use(morgan("dev"));
 app.use(urlencoded({ extended: true }));
 app.use(json());
 app.use("/api/user", userRouter);
-app.use("/api/family", familyRouter);
 app.get("/api", verifyUser);
 app.post("/api/signup", signup);
 app.post("/api/login", signin);

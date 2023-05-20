@@ -2,7 +2,6 @@ import jwt from "jsonwebtoken";
 import { config } from "../config/dev";
 import User from "../user/usermodel";
 import bcrypt from "bcrypt";
-import Family from "../family/family.model";
 export const passwordValidation = ({ password }) => {
   const regularExpression =
     /^(?=.*[0-9])(?=.*[!@#$%^&*_:])[a-zA-Z0-9!@#$%^&*_:]{6,16}$/;

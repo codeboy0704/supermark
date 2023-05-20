@@ -2,7 +2,7 @@ import mongoose, { Schema } from "mongoose";
 import bcrypt from "bcrypt";
 import makeNewConnection from "../utils/connection";
 import { config } from "../config/dev";
-import { familySchema } from "../family/family.model";
+
 
 export const userSchema = new mongoose.Schema(
   {
@@ -23,12 +23,6 @@ export const userSchema = new mongoose.Schema(
       required: [true, "You need to provide a password"],
       validate: [],
     },
-    families: [
-      {
-        type: Schema.Types.ObjectId,
-        ref: "family",
-      },
-    ],
   },
   { timestamps: true }
 );
