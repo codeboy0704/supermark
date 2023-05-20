@@ -6,7 +6,7 @@ const productSchema = new mongoose.Schema(
         type: String,
         required: true,
         trim: true,
-        maxlength: 32
+        maxlength: 80
     },
     prices:[{
         stablishment: {type: String, required: true},
@@ -17,5 +17,5 @@ const productSchema = new mongoose.Schema(
 );
 
 productSchema.index({ user: 1, name: 1 }, { unique: true });
- const Product = mongoose.model("product", productSchema);
+ const Product = mongoose.model("Product", productSchema);
  export default Product;

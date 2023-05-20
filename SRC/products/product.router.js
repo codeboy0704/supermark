@@ -1,7 +1,8 @@
 import { Router } from "express";
 const router = Router();
-import { createProduct, getProduct } from "./product.controller";
-router.post("/create", createProduct)
-router.get("/many", getProduct)
+import { create, createMany, getProduct } from "./product.controller";
+router.post("/create/one", create)
+router.get("/get/many", getProduct)
+router.get("/create/many", createMany)
 
 export default router
