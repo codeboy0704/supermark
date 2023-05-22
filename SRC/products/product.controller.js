@@ -38,9 +38,29 @@ export const createMany = async(req, res, next) => {
 }
 
 export const getProduct = async(req, res, next) => {
+  
   try{
-    const product = await Product.find({})
-    return res.status(200).json({data: product})
+    let page = req.body.page || 0;
+    let limit = req.body.limit || 10;
+    const startIndex = page * limit;
+    const endIndex = (page + 1) * limit;
+    const result = {}
+    const total = await Product.countDocuments().exec()
+    if (startIndex > 0) {
+      result.previous = {
+        page: page - 1,
+        limit: limit,
+      };
+   }
+     if (endIndex < total) {
+      result.next = {
+        page: page + 1,
+        limit: limit,
+      };
+      result.total = total
+    }
+    result.data = await Product.find({}).sort("-_id").skip(startIndex).limit(limit).exec()
+    return res.status(200).json({data: result})
   }catch(e){
     next(e)
   }
