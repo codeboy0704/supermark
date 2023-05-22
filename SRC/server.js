@@ -6,6 +6,7 @@ import bodyParser, { json, urlencoded} from "body-parser";
 import cors from "cors";
 import userRouter from "./user/user.router";
 import productRouter from "./products/product.router"
+import establishmentRouter from "./establishment/establishment.router"
 import { config } from "./config/dev";
 import {
   logOut,
@@ -39,6 +40,7 @@ app.use(morgan("dev"));
 app.use(urlencoded({ extended: true }));
 app.use(bodyParser.json());
 app.post("/api/login", signin);
+app.use("/api/establishment", establishmentRouter )
 app.use("/api/user", userRouter);
 app.use("/api/product", productRouter)
 app.get("/api", verifyUser);

@@ -1,22 +1,28 @@
-import Stablishment from "./Establishment";
+import Establishment from "./Establishment";
 import Product from "../products/Products";
+import { createSingleEstablishment } from "../services/establishment/createSingleEstablishment";
+import cleanData from "../utils/cleanData";
+
 export async function createStablishmentOnce(req,res,next){
-if(!name){
-    return res.status(400).json({message: "At least you must provide a name"})
-}
- try{
-    const stablishment = await Stablishment.create({
-        name,
-    })
-    return res.status(201).json({data: stablishment})
- }catch(e){
-    next(e)
- }
+const establishments = cleanData()[0].establecimientos.map(el => el.stablishment)
+    try{
+        if(await Establishment.collection.countDocuments() == 0 ){ 
+            establishments.map(el =>{
+                createSingleEstablishment({name: el})
+            })
+            const savedEstablishments = await Establishment.find({}).exec()
+            return res.status(201).json({message: "Stablishments created", data: savedEstablishments})
+        }else{
+            return res.status(400).json({message: "Stablishments already created"})
+        }
+    }catch(e){
+        next(e)
+    }
 }
 
 export async function getStablishment(req,res,next){
     try{
-        const stablishment = await Stablishment.find({})
+        const stablishment = await Establishment.find({})
         res.status(200).json({data: stablishment})
     }catch(e){
         next(e)
@@ -26,13 +32,13 @@ export async function getStablishment(req,res,next){
 export async function saveProductsOnSta(req, res, next) { 
     try {
         let product = await Product.find({}).exec()
-        let sta = await Stablishment.find({}).exec()
+        let sta = await Establishment.find({}).exec()
         if (sta[0].products.length === 0) {
             const staMapper = sta.map(async staEl => {
                 const find = product.map(async prEl => {
                     let found = prEl.prices.find(el => el.stablishment == staEl.name)
                     if (found) { 
-                        let updated = await Stablishment.findOneAndUpdate({ name: found.stablishment }, { $push: { products: prEl._id } }, { new: true })
+                        let updated = await Establishment.findOneAndUpdate({ name: found.stablishment }, { $push: { products: prEl._id } }, { new: true })
                         return updated
                     }
                 })
@@ -49,7 +55,7 @@ export async function saveProductsOnSta(req, res, next) {
 
 export async function getProductsOnSta(req, res, next) { 
     try {
-        let sta = await Stablishment.findOne({ name: req.body.name }).exec()
+        let sta = await Establishment.findOne({ name: req.body.name }).exec()
         if (!sta) {
             console.log(req.params)
             return res.status(404).json({ message: "Stablishment not found" })
