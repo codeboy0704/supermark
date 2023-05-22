@@ -1,6 +1,6 @@
 import mongoose from "mongoose";
 
-const stablishmentSchema = new mongoose.Schema({
+const establishmentSchema = new mongoose.Schema({
     name:{
         type: String,
         required: true,
@@ -17,5 +17,5 @@ const stablishmentSchema = new mongoose.Schema({
     }]
 }, {timestamps: true})
 
-const Stablishment = mongoose.model("stablishment", stablishmentSchema)
-export default Stablishment
+const Establishment = mongoose.model("stablishment", establishmentSchema)
+export default Establishment
