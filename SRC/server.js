@@ -2,7 +2,7 @@ import express from "express";
 import session from "express-session";
 const MongoDBSession = require("connect-mongodb-session")(session);
 import morgan from "morgan";
-import { json, urlencoded } from "body-parser";
+import bodyParser, { json, urlencoded} from "body-parser";
 import cors from "cors";
 import userRouter from "./user/user.router";
 import productRouter from "./products/product.router"
@@ -37,12 +37,12 @@ app.use(
 require("dotenv").config();
 app.use(morgan("dev"));
 app.use(urlencoded({ extended: true }));
-app.use(json());
+app.use(bodyParser.json());
+app.post("/api/login", signin);
 app.use("/api/user", userRouter);
 app.use("/api/product", productRouter)
 app.get("/api", verifyUser);
 app.post("/api/signup", signup);
-app.post("/api/login", signin);
 app.delete("/api/logout", logOut);
 app.use("/", errorHandler);
 

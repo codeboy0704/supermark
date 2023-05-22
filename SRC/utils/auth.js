@@ -115,7 +115,6 @@ export const signup = async (req, res, next) => {
   try {
     const user = await User.create(userData);
     const token = newToken(user);
-
     res.status(201).json({ data: token });
   } catch (e) {
     console.error(e);
@@ -129,7 +128,7 @@ export const signup = async (req, res, next) => {
 
 export const signin = async (req, res, next) => {
   const { username, password } = req.body;
-  if (!username || !password) {
+  if (!username && !password) {
     return res.status(400).send({
       message: "User and password require",
       sta: { user: false, password: false },
@@ -148,7 +147,7 @@ export const signin = async (req, res, next) => {
 
   const user = await User.findOne({ name: username }).exec();
   if (!user) {
-    return res.status(401).send({
+    return res.status(404).send({
       message: "The user don't exist",
       sta: { user: false, password: true },
     });
