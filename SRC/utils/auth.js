@@ -86,7 +86,7 @@ export const logOut = async (req, res, next) => {
 export const signup = async (req, res, next) => {
   const { username, password, email } = req.body;
   const userData = {
-    name: req.body.username,
+    name: username,
     password: password,
     email: email,
   };
@@ -113,6 +113,21 @@ export const signup = async (req, res, next) => {
   }
 
   try {
+    const Users = await User.find({}).exec();
+    const findUser = Users.find((user) => user.name === username);
+    const findEmail = Users.find((user) => user.email === email);
+    if (findUser) {
+      return res.status(400).send({
+        message: "User already exist",
+        sta: { user: false, password: true, email: true },
+      });
+    }
+    if (findEmail) {
+      return res.status(400).send({
+        message: "Email already exist",
+        sta: { user: true, password: true, email: false },
+      });
+    }
     const user = await User.create(userData);
     const token = newToken(user);
     res.status(201).json({ data: token });
