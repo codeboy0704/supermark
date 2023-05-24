@@ -1,0 +1,7 @@
+[
+  { "name": "Lugar A", "lat": 40.7128, "lon": -74.006 },
+  { "name": "Lugar B", "lat": 34.0522, "lon": -118.2437 },
+  { "name": "Lugar C", "lat": 51.5074, "lon": -0.1278 },
+  { "name": "Lugar D", "lat": 35.5074, "lon": -0.1328 },
+  { "name": "Lugar F", "lat": 71.5074, "lon": -0.4378 }
+]

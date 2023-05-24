@@ -19,7 +19,8 @@ import {
 import User from "./user/usermodel";
 import errorHandler from "./errorHandler";
 import makeConnection from "./utils/connection";
-import getLocation from "./services/geolocation/getEstablishmentLocation";
+
+import { getNearestPlaces } from "./services/geolocation/location.controller";
 
 const port = 8000;
 const app = express();
@@ -45,7 +46,7 @@ app.use("/api/establishment", establishmentRouter )
 app.use("/api/user", userRouter);
 app.use("/api/product", productRouter)
 app.get("/api", verifyUser);
-app.get("/api/location", getLocation)
+app.get("/api/location", getNearestPlaces )
 app.post("/api/signup", signup);
 app.delete("/api/logout", logOut);
 app.use("/", errorHandler);
