@@ -22,8 +22,28 @@ const establishments = cleanData()[0].establecimientos.map(el => el.stablishment
 
 export async function getStablishment(req,res,next){
     try{
-        const stablishment = await Establishment.find({})
-        res.status(200).json({data: stablishment})
+        let page = req.body.page || 0;
+        let limit = req.body.limit || 1;
+         const startIndex = page * limit;
+        const endIndex = (page + 1) * limit;
+        const result = {};
+        const total = await Establishment.countDocuments().exec()
+        if (startIndex > 0) {
+            result.previous = {
+             page: page - 1,
+             limit: limit,
+            };
+        }
+        if (endIndex < total) {
+            result.next = {
+                page: page + 1,
+                limit: limit,
+            };
+        }
+        result.total = total
+        result.data = await Establishment.find({}).sort("-_id").skip(startIndex).limit(limit).exec()
+        const stablishment = await Establishment.find({}).exec()
+        res.status(200).json({data: result})
     }catch(e){
         next(e)
     }
