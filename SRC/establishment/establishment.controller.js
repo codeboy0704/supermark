@@ -29,6 +29,16 @@ export async function getStablishment(req,res,next){
     }
 }
 
+export async function getStablishmentName(req,res,next){
+    try{
+        const establishments = await Establishment.find({}).exec()
+        const names = establishments.map(el => el.name)
+        res.status(200).json({data: names})
+    }catch(e){
+
+    }
+}
+
 export async function saveProductsOnSta(req, res, next) { 
     try {
         let product = await Product.find({}).exec()
@@ -67,5 +77,31 @@ export async function getProductsOnSta(req, res, next) {
         
     } catch (e) {
         next(e)
+    }
+}
+
+export async function addLatLonToEstablishment(req, res, next){
+    const {data} = req.body;
+    try{
+        const establishments = await Establishment.find({}).limit(2).exec()
+        if(establishments[0].lat && establishments[0].lon){
+            return res.status(400).json({message: "Already added"})
+        }
+        const map = data.map(async el =>{
+            const found  = await Establishment.findOne({name: el.oldname ? el.oldname : el.name})
+            if(found){
+                if(el.oldname){
+                    const updateName = await Establishment.findOneAndUpdate({name: el.oldname}, {name: el.name, lat: el.lat, lon:el.lon}, {new: true})
+                    return updateName
+                }else{
+                    const updated = await Establishment.findOneAndUpdate({name: found.name}, {lat: el.lat, lon: el.lon}, {new: true})
+                    return updated
+                }
+            }
+        })
+        const saved = await Promise.all(map)
+        return res.status(201).json({data: saved})
+    }catch(e){
+       next(e)
     }
 }

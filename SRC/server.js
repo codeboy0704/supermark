@@ -19,9 +19,9 @@ import {
 import User from "./user/usermodel";
 import errorHandler from "./errorHandler";
 import makeConnection from "./utils/connection";
-
 import { getNearestPlaces } from "./services/geolocation/location.controller";
-
+import { addLatLonToEstablishment } from "./services/establishment/addlocationInfoToEstablishments";
+import establishmnetLocationData from "./services/geolocation/establishmentsLocation.json"
 const port = 8000;
 const app = express();
 const store = new MongoDBSession({
@@ -60,6 +60,7 @@ const start = () => {
     app.listen(port, () => {
       console.log(`Server up on port ${port}`);
       makeConnection()
+      addLatLonToEstablishment({data: establishmnetLocationData})
     });
   } catch (e) {
     console.error(e);
