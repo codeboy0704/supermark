@@ -7,9 +7,15 @@ const establishmentSchema = new mongoose.Schema({
         trim: true,
         maxlength: 32
     },
-    address:{
-        type: String,
+    alt:{
+        type: Number,
         trim: true,
+        maxlength: 40
+    },
+    lon:{
+        type: Number,
+        trim: true,
+        maxlength: 40
     },
     products: [{
         type: mongoose.Schema.Types.ObjectId,
