@@ -7,7 +7,7 @@ const establishmentSchema = new mongoose.Schema({
         trim: true,
         maxlength: 32
     },
-    alt:{
+    lat:{
         type: Number,
         trim: true,
         maxlength: 40
