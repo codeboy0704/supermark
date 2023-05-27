@@ -60,7 +60,7 @@ const start = () => {
     app.listen(port, () => {
       console.log(`Server up on port ${port}`);
       makeConnection()
-      addLatLonToEstablishment({data: establishmnetLocationData})
+      // addLatLonToEstablishment({data: establishmnetLocationData})
     });
   } catch (e) {
     console.error(e);

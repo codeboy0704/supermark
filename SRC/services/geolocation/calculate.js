@@ -19,11 +19,11 @@ function calculateDistance({userLocation, establishmentLocation}){
 function findNearestEstablishment({lat, lon, establishments}){
     const nearest = establishments.map(esta =>{
         const distance = calculateDistance({userLocation: {userLat: lat, userLon: lon}, establishmentLocation: {establishmentLat: esta.lat, establishmentLon: esta.lon}})
-        return {...esta , distance}
+        return {_id: esta._id , name: esta.name, lat:esta.lat, lon: esta.lon,  distance}
     })
 
     const sorted = nearest.sort((a,b) => a.distance - b.distance);
-    return sorted.slice(0,3).map(esta => ({...esta}))
+    return sorted.slice(0,4).map(esta => ({...esta}))
 }
 
 export default findNearestEstablishment;
