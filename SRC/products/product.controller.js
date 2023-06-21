@@ -37,8 +37,21 @@ export const createMany = async(req, res, next) => {
   }
 }
 
+export const  getSingleProduct = async (req, res, next) =>{
+  try{
+    const {id} = req.body;
+    console.log(id)
+    const product = await Product.findById(id).exec()
+    if(!product){
+      return res.status(404).json({message: "Product not found"})
+    }
+    return res.status(200).json({data: product})
+  }catch (e){
+    next(e)
+  }
+}
+
 export const getProduct = async(req, res, next) => {
-  
   try{
     let page = req.body.page || 0;
     let limit = req.body.limit || 10;
