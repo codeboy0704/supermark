@@ -46,7 +46,6 @@ app.use("/api/establishment", establishmentRouter )
 app.use("/api/user", userRouter);
 app.use("/api/product", productRouter)
 app.get("/api", verifyUser);
-app.get("/api/location", getNearestPlaces )
 app.post("/api/signup", signup);
 app.delete("/api/logout", logOut);
 app.use("/", errorHandler);
