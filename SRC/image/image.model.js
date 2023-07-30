@@ -4,15 +4,15 @@ const imageSchema = new mongoose.Schema({
     productID: {
         type: mongoose.Schema.Types.ObjectId,
         ref: "products",
-        require: true,
     },
     title: {
         type: String,
         required: true
     },
     image: {
-        data: Buffer,
-        contentType: String
+        type: Buffer,
+        contentType: String,
+        required: true
     }
 })
 
