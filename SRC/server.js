@@ -2,7 +2,7 @@ import express from "express";
 import session from "express-session";
 const MongoDBSession = require("connect-mongodb-session")(session);
 import morgan from "morgan";
-import bodyParser, { json, urlencoded} from "body-parser";
+import bodyParser, { json, urlencoded } from "body-parser";
 import cors from "cors";
 import userRouter from "./user/user.router";
 import productRouter from "./products/product.router"
@@ -19,15 +19,9 @@ import {
 import User from "./user/usermodel";
 import errorHandler from "./errorHandler";
 import makeConnection from "./utils/connection";
-import { getNearestPlaces } from "./services/geolocation/location.controller";
-import { addLatLonToEstablishment } from "./services/establishment/addlocationInfoToEstablishments";
-import establishmnetLocationData from "./services/geolocation/establishmentsLocation.json"
 const port = 8000;
 const app = express();
-const store = new MongoDBSession({
-  uri: config.sessionDB,
-  collection: "mySessions",
-});
+
 app.disable("x-powered-by");
 app.use(
   cors({
@@ -42,7 +36,7 @@ app.use(morgan("dev"));
 app.use(urlencoded({ extended: true }));
 app.use(bodyParser.json());
 app.post("/api/login", signin);
-app.use("/api/establishment", establishmentRouter )
+app.use("/api/establishment", establishmentRouter)
 app.use("/api/user", userRouter);
 app.use("/api/product", productRouter)
 app.get("/api", verifyUser);
@@ -59,7 +53,6 @@ const start = () => {
     app.listen(port, () => {
       console.log(`Server up on port ${port}`);
       makeConnection()
-      // addLatLonToEstablishment({data: establishmnetLocationData})
     });
   } catch (e) {
     console.error(e);
