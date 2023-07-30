@@ -1,6 +1,5 @@
 import express from "express";
 import session from "express-session";
-const MongoDBSession = require("connect-mongodb-session")(session);
 import morgan from "morgan";
 import bodyParser, { json, urlencoded } from "body-parser";
 import cors from "cors";
@@ -16,7 +15,6 @@ import {
   verifyToken,
   verifyUser,
 } from "./utils/auth";
-import User from "./user/usermodel";
 import errorHandler from "./errorHandler";
 import makeConnection from "./utils/connection";
 const port = 8000;

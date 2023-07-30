@@ -5,7 +5,8 @@
   "main": "server.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "dev": "nodemon --exec babel-node ./SRC/server.js && ./SRC/userServer.js"
+    "dev": "nodemon --exec babel-node ./SRC/server.js && ./SRC/userServer.js",
+    "compress": "node ./SRC/utils/compressImages.js "
   },
   "author": "",
   "license": "ISC",
@@ -22,7 +23,8 @@
     "mongodb": "^5.5.0",
     "mongoose": "^6.7.0",
     "morgan": "^1.10.0",
-    "nodemon": "^2.0.20"
+    "nodemon": "^2.0.20",
+    "sharp": "^0.32.4"
   },
   "devDependencies": {
     "@babel/cli": "^7.19.3",
