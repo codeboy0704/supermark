@@ -6,6 +6,7 @@ import cors from "cors";
 import userRouter from "./user/user.router";
 import productRouter from "./products/product.router"
 import establishmentRouter from "./establishment/establishment.router"
+import imageRouter from "./image/image.router"
 import { config } from "./config/dev";
 import {
   logOut,
@@ -37,6 +38,7 @@ app.post("/api/login", signin);
 app.use("/api/establishment", establishmentRouter)
 app.use("/api/user", userRouter);
 app.use("/api/product", productRouter)
+app.use('/api/image', imageRouter)
 app.get("/api", verifyUser);
 app.post("/api/signup", signup);
 app.delete("/api/logout", logOut);
