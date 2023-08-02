@@ -40,3 +40,12 @@ export const getBinaryImg = async (req, res, next) => {
         next(e)
     }
 }
+
+export const getImage = async (req, res, next) => {
+    try {
+        const images = await Image.find({})
+        return res.status(200).json({ data: images })
+    } catch (e) {
+        next(e)
+    }
+}
