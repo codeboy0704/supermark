@@ -91,3 +91,12 @@ export const getProduct = async (req, res, next) => {
     next(e)
   }
 }
+
+export const getProductName = async (req, res, next) => {
+  try {
+    const products = await Product.find({}, { name: 1 }).exec()
+    return res.status(201).json({ data: products })
+  } catch (e) {
+    next(e)
+  }
+}
