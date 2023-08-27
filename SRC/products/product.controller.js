@@ -39,7 +39,7 @@ export const createMany = async (req, res, next) => {
 
 export const getProductById = async (req, res, next) => {
   try {
-    const { id } = req.body;
+    const { id } = req.params;
     console.log(id)
     const product = await Product.findById(id).exec()
     if (!product) {
@@ -65,9 +65,8 @@ export const getProductByName = async (req, res, next) => {
 }
 
 export const getProduct = async (req, res, next) => {
+  const { page, limit } = req.params
   try {
-    let page = req.body.page || 0;
-    let limit = req.body.limit || 10;
     const startIndex = page * limit;
     const endIndex = (page + 1) * limit;
     const result = {}
