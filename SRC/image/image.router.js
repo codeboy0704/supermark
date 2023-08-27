@@ -1,9 +1,11 @@
 import { Router } from "express";
-import { getBinaryImg, saveImage } from "./image.controller";
+import { getBinaryImg, getMany, getOne, saveImage } from "./image.controller";
 const router = Router();
 
 
 router.post('/save', saveImage)
-router.get('/:title', getBinaryImg)
+router.get('/', getMany)
+router.get("/:id", getOne)
+router.get('/:_id', getBinaryImg)
 
 export default router

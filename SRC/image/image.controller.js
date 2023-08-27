@@ -17,6 +17,13 @@ export const saveImage = async (req, res, next) => {
             const productsData = await Product.find({}, { name: 1 }).exec()
             const equal = productsData.find(product => product.name.toLowerCase() == capitalizeName.toLowerCase())
             const similar = productsData.find(product => product.name.toLowerCase().includes(capitalizeName.toLowerCase()))
+            if (equal.image) {
+                const image = Image.findById(equal.image)
+                return res.status(400).json({ data: { message: "Imagen ya almacenada", img: image } })
+            } else if (similar.image) {
+                const image = Image.findById(similar.image)
+                return res.status(400).json({ data: { message: "Imagen ya almacenada", img: image } })
+            }
             if (equal) {
                 const img = new Image({
                     title: capitalizeName,
@@ -50,13 +57,12 @@ export const saveImage = async (req, res, next) => {
 }
 
 export const getBinaryImg = async (req, res, next) => {
-    const imageTitle = req.params.title;
+    const imageId = req.params._id;
     try {
-        const img = await Image.findOne({ title: imageTitle })
+        const img = await Image.findOne({ _id: imageId })
         if (!img) {
             return res.status(404).json({ data: "Imagen no encontrada" })
         }
-
         res.contentType('image/jpeg')
         res.status(201).json({ data: img.image })
     } catch (e) {
@@ -64,9 +70,23 @@ export const getBinaryImg = async (req, res, next) => {
     }
 }
 
-export const getImage = async (req, res, next) => {
+export const getOne = async (req, res, next) => {
+    const { id } = req.params
     try {
-        const images = await Image.find({})
+        const image = await Image.findOne({ _id: id }).exec()
+        if (!image) {
+            return res.status(404).json({ data: "Imagen no encontarda" })
+        }
+        return res.status(200).json({ data: image })
+
+    } catch (e) {
+        next(e)
+    }
+}
+
+export const getMany = async (req, res, next) => {
+    try {
+        const images = await Image.find({}).exec()
         return res.status(200).json({ data: images })
     } catch (e) {
         next(e)
