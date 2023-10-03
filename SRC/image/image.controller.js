@@ -57,14 +57,16 @@ export const saveImage = async (req, res, next) => {
 }
 
 export const getBinaryImg = async (req, res, next) => {
-    const imageId = req.params._id;
+    const imageId = req.params.id;
     try {
-        const img = await Image.findOne({ _id: imageId })
+        const img = await Image.findById(imageId)
         if (!img) {
-            return res.status(404).json({ data: "Imagen no encontrada" })
+            res.status(404).json({ data: img })
+            return
         }
-        res.contentType('image/jpeg')
-        res.status(201).json({ data: img.image })
+        const imageData = img.image
+        res.contentType('image/jpeg');
+        res.send(imageData);
     } catch (e) {
         next(e)
     }

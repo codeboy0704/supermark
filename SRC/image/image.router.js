@@ -5,7 +5,7 @@ const router = Router();
 
 router.post('/save', saveImage)
 router.get('/', getMany)
-router.get("/:id", getOne)
-router.get('/:_id', getBinaryImg)
+// router.get("/:id", getOne)
+router.get('/:id', getBinaryImg)
 
 export default router
