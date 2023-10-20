@@ -2,25 +2,7 @@ import jwt from "jsonwebtoken";
 import { config } from "../config/dev";
 import User from "../user/usermodel";
 import bcrypt from "bcrypt";
-export const userValidation = async (req,res,next) =>{
-    const {user, password} = req.body
-    if(!user || !password){
-        return res.status(400).json({message: "User and password require to get access"})
-    }
-    try{
-      if(user == process.env.MAIN_USER_NAME && password == process.env.MAIN_USER_PASSWORD ){
-        next()
-      }else{
-        return res.status(401).json({message: "User or password incorrect, try again"})
-      }
-    }catch(e){
-      let err = {
-        status: e.status,
-        message: 'Something went wrong with the user validation'
-      }
-        next(err)
-    }
-}
+
 export const passwordValidation = ({ password }) => {
   const regularExpression =
     /^(?=.*[0-9])(?=.*[!@#$%^&*_:])[a-zA-Z0-9!@#$%^&*_:]{6,16}$/;
@@ -210,28 +192,37 @@ export const verifyUser = async (req, res, next) => {
 };
 
 export async function isAdmin(req, res, next) {
-  const { user, family } = req.body;
-  if ((!user, !family))
-    return res
-      .status(404)
-      .send({ message: "You need to provide the user and family data" });
+  const { user } = req.body
+  const id = user._id
   try {
-    const familyDoc = await Family.findOne({ name: family.name }).lean().exec();
-    const userDoc = await User.findOne({ name: user.name }).lean().exec();
-    if (!familyDoc)
-      return res.status(404).send({ message: "Family not found" });
-    if (!findUser) return res.status(404).send({ message: "User not found" });
-    if (familyDoc.createdBy.equals(userDoc._id)) {
-      return next();
-    }
-    return res
-      .status(401)
-      .send({ message: "You are not the admin of this family" });
+    let user = await User.findById(id).exec()
+    if (!user)
+      return res.status(404).send({ data: { message: "User not found" } })
+
+    if (user.role !== config.roles.ADMIN) //Pass to func to check admin and return boolean
+      return res.status(401).send({ data: { message: "Unauthorized" } })
+    return res.status(201).send({ data: { message: "Credentials validated" } })
   } catch (e) {
-    const err = {
-      status: e.status,
-      message: e.message,
-    };
-    next(err);
+    next(e)
+  }
+}
+
+export async function makeAdmin(req, res, next) {
+  const { admin, user } = req.body
+  try {
+    let getAdmin = await User.findById(admin._id).exec()
+    if (!getAdmin) {
+      return res.status(404).send({ data: { message: "Admin not found" } })
+    }
+    if (getAdmin.role !== config.roles.ADMIN) {
+      return res.status(401).send({ data: { message: "Unauthorized" } })
+    }
+    let getUser = await User.findByIdAndUpdate(user._id, { role: config.roles.ADMIN })
+    if (!getUser) {
+      return res.status(404).send({ data: { message: "User not found" } })
+    }
+    return res.status(201).json({ data: { user: getUser, message: "User role updated" } })
+  } catch (e) {
+    next(e)
   }
 }
