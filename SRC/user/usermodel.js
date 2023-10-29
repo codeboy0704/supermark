@@ -2,7 +2,6 @@ import mongoose, { Schema } from "mongoose";
 import bcrypt from "bcrypt";
 import { config } from "../config/dev";
 
-
 export const userSchema = new mongoose.Schema(
   {
     name: {
@@ -22,6 +21,10 @@ export const userSchema = new mongoose.Schema(
       required: [true, "You need to provide a password"],
       validate: [],
     },
+    role: {
+      type: Number,
+      default: config.roles.READ
+    }
   },
   { timestamps: true }
 );
