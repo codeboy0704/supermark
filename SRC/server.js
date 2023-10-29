@@ -18,7 +18,7 @@ import {
 } from "./utils/auth";
 import errorHandler from "./errorHandler";
 import makeConnection from "./utils/connection";
-const port = 8000;
+const port = config.port;
 const app = express();
 
 app.disable("x-powered-by");
@@ -39,8 +39,7 @@ app.use("/api/establishment", establishmentRouter)
 app.use("/api/user", userRouter);
 app.use("/api/product", productRouter)
 app.use('/api/image', imageRouter)
-app.get("/api", verifyUser);
-app.post("/api/signup", signup);
+app.post("/api/register", signup);
 app.delete("/api/logout", logOut);
 app.use("/", errorHandler);
 
