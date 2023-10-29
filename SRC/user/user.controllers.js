@@ -1,8 +1,9 @@
 import User from "./usermodel";
 
-export const getUser = async (req, res) => {
+export const getUser = async (req, res, next) => {
+  const { _id } = req.params
   try {
-    const user = await User.findById(req.body._id).exec();
+    const user = await User.findById(_id).exec();
     res.status(200).json({ data: user });
   } catch (e) {
     console.error(e);
@@ -10,7 +11,7 @@ export const getUser = async (req, res) => {
   }
 };
 
-export const updateUser = async (req, res) => {
+export const updateUser = async (req, res, next) => {
   try {
     const user = await User.findByIdAndUpdate(req.user._id, req.body, {
       new: true,
@@ -24,9 +25,9 @@ export const updateUser = async (req, res) => {
   }
 };
 
-export const deleteUser = async (req, res) => {
+export const deleteUser = async (req, res, next) => {
   try {
-    const _id = req.user._id;
+    const { _id } = req.params;
     const user = await User.findByIdAndDelete(_id).exec();
     res.status(200).json({ data: user });
   } catch (e) {
