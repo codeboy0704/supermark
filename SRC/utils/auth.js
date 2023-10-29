@@ -30,8 +30,8 @@ export function verifyPassword(password, hashPassword) {
 }
 
 export const newToken = (user) => {
-  return jwt.sign({ id: user.id }, config.ACCESS_TOKEN_SECRET, {
-    expiresIn: "1d",
+  return jwt.sign({ user }, config.ACCESS_TOKEN_SECRET, {
+    expiresIn: "1h",
   });
 };
 
@@ -48,7 +48,6 @@ export const logOut = async (req, res, next) => {
   let token = req.headers["token"];
   try {
     let randomNumberToAppend = toString(Math.floor(Math.random() * 1000 + 1));
-    let randomIndex = Math.floor(Math.random() * 10 + 1);
     let hashedRandomNumberToAppend = await bcrypt.hash(
       randomNumberToAppend,
       10
@@ -70,7 +69,7 @@ export const signup = async (req, res, next) => {
   const userData = {
     name: username,
     password: password,
-    email: email,
+    email: email
   };
   if (!username && !password) {
     return res.status(400).json({
@@ -151,7 +150,6 @@ export const signin = async (req, res, next) => {
   }
 
   try {
-    console.log(user);
     const match = await verifyPassword(password, user.password);
     if (!match) {
       return res.status(401).send({
@@ -162,7 +160,7 @@ export const signin = async (req, res, next) => {
     const token = newToken(user);
     return res.status(201).send({ token });
   } catch (e) {
-    // console.error(e);
+    console.log(e)
     const error = { status: 401, message: "Not Auth" };
     next(error);
   }
@@ -175,53 +173,44 @@ export const verifyUser = async (req, res, next) => {
   }
   try {
     const payload = await verifyToken(token);
-    const user = await User.findById(payload.id)
-      .select("-password")
-      .lean()
-      .exec();
-    req.user = user;
-    if (!user.family) {
-      return res.status(201).json({ message: "Auth", data: { user, family } });
-    }
-    const family = await Family.findById(user.family._id);
-    return res.status(201).send({ message: "Auth", data: { user, family } });
+    req.verifyPayload = payload;
+    next()
   } catch (e) {
-    console.error(e);
-    next(e);
+    if (e instanceof jwt.TokenExpiredError)
+      res.status(401).send('Token has expired');
+    else if (e instanceof jwt.JsonWebTokenError)
+      res.status(401).send('Invalid token');
+    else
+      next(e);
+
   }
 };
 
 export async function isAdmin(req, res, next) {
-  const { user } = req.body
-  const id = user._id
+  const { _id, role } = req.verifyPayload
   try {
-    let user = await User.findById(id).exec()
+    let user = await User.findById(_id).exec()
     if (!user)
-      return res.status(404).send({ data: { message: "User not found" } })
+      return res.status(404).send("User not found")
 
-    if (user.role !== config.roles.ADMIN) //Pass to func to check admin and return boolean
-      return res.status(401).send({ data: { message: "Unauthorized" } })
-    return res.status(201).send({ data: { message: "Credentials validated" } })
+    if (role !== config.roles.ADMIN) //Pass to func to check admin and return boolean
+      return res.status(401).send("Unauthorized")
+    else
+      next()
   } catch (e) {
     next(e)
   }
 }
 
 export async function makeAdmin(req, res, next) {
-  const { admin, user } = req.body
+  const { user } = req.body
+  const admin = req.verifyPayload
   try {
-    let getAdmin = await User.findById(admin._id).exec()
-    if (!getAdmin) {
-      return res.status(404).send({ data: { message: "Admin not found" } })
-    }
-    if (getAdmin.role !== config.roles.ADMIN) {
-      return res.status(401).send({ data: { message: "Unauthorized" } })
-    }
     let getUser = await User.findByIdAndUpdate(user._id, { role: config.roles.ADMIN })
     if (!getUser) {
-      return res.status(404).send({ data: { message: "User not found" } })
+      return res.status(404).send("User not found")
     }
-    return res.status(201).json({ data: { user: getUser, message: "User role updated" } })
+    return res.status(201).send("User role updated")
   } catch (e) {
     next(e)
   }
