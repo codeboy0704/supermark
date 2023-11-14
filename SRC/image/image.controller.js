@@ -59,9 +59,10 @@ export const saveImage = async (req, res, next) => {
 export const getBinaryImg = async (req, res, next) => {
     const { id } = req.params.id;
     try {
+        console.log(id)
         const img = await Image.findById(id)
         if (!img) {
-            res.status(404).json({ data: img })
+            res.status(404).send("Image not found")
             return
         }
         const imageBuffer = Buffer.from(img.image, 'base64');

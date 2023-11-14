@@ -1,10 +1,12 @@
 function toRadians(grados) {
-  return grados * (Math.PI / 180);
+    return grados * (Math.PI / 180);
 }
 
-function calculateDistance({userLocation, establishmentLocation}){
-    const {userLat, userLon} = userLocation;
-    const {establishmentLat, establishmentLon} = establishmentLocation;
+function calculateDistance({ userLocation, establishmentLocation }) {
+    const { userLat, userLon } = userLocation;
+    const { establishmentLat, establishmentLon } = establishmentLocation;
+    console.log(userLocation)
+    console.log(establishmentLocation)
     const R = 6371; // Radio de la Tierra en kilómetros
     const dLat = toRadians(establishmentLat - userLat);
     const dLon = toRadians(establishmentLon - userLon);
@@ -16,14 +18,14 @@ function calculateDistance({userLocation, establishmentLocation}){
     return distancia;
 }
 
-function findNearestEstablishment({lat, lon, establishments}){
-    const nearest = establishments.map(esta =>{
-        const distance = calculateDistance({userLocation: {userLat: lat, userLon: lon}, establishmentLocation: {establishmentLat: esta.lat, establishmentLon: esta.lon}})
-        return {_id: esta._id , name: esta.name, lat:esta.lat, lon: esta.lon,  distance}
+function findNearestEstablishment({ lat, lon, establishments }) {
+    const nearest = establishments.map(esta => {
+        const distance = calculateDistance({ userLocation: { userLat: lat, userLon: lon }, establishmentLocation: { establishmentLat: esta.lat, establishmentLon: esta.lon } })
+        return { _id: esta._id, name: esta.name, lat: esta.lat, lon: esta.lon, distance }
     })
 
-    const sorted = nearest.sort((a,b) => a.distance - b.distance);
-    return sorted.slice(0,4).map(esta => ({...esta}))
+    const sorted = nearest.sort((a, b) => a.distance - b.distance);
+    return sorted.slice(0, 4).map(esta => ({ ...esta }))
 }
 
 export default findNearestEstablishment;

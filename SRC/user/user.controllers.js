@@ -11,6 +11,18 @@ export const getUser = async (req, res, next) => {
   }
 };
 
+export const getUserByToken = async (req, res, next) => {
+  const data = req.verifyPayload
+  try {
+    if (data)
+      return res.status(200).json({ data: data })
+    else
+      return res.status(400).send("No User data")
+  } catch (e) {
+    next(e)
+  }
+}
+
 export const updateUser = async (req, res, next) => {
   try {
     const user = await User.findByIdAndUpdate(req.user._id, req.body, {
