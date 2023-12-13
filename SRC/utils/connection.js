@@ -1,19 +1,26 @@
 import mongoose from "mongoose";
+import { MongoClient, ServerApiVersion } from "mongodb";
+const uri = "mongodb+srv://<username>:<password>@cluster0.85xa1ve.mongodb.net/?retryWrites=true&w=majority";
 import { config } from "../config/dev";
 const dotenv = require("dotenv");
 dotenv.config({ path: "config.env" });
 
-async function makeNewConnection(uri) {
+const client = new MongoClient(uri, {
+  serverApi: {
+    version: ServerApiVersion.v1,
+    strict: true,
+    deprecationErrors: true,
+  }
+})
+
+async function connection() {
   try {
-    return mongoose.connect(uri, {
-      useNewUrlParser: true,
-      useUnifiedTopology: true,
-    });
-  } catch (e) {
-    console.error(e);
+    await client.connect()
+    await client.db("admin").command({ ping: 1 });
+    console.log("Pinged your deployment. You successfully connected to MongoDB!");
+  } finally {
+    await client.close()
   }
 }
-// export const userConnection = makeNewConnection(config.userDB);
-export default makeNewConnection;
 
-// export const sessionsConnection = makeNewConnection(config.sessionDB);
+connection().catch(console.dir)
